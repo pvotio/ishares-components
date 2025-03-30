@@ -1,7 +1,7 @@
-azure-identity==1.19.0
-beautifulsoup4==4.12.3
-fast-to-sql==2.3.0
-numpy==2.2.0
-pandas==2.2.3
-pyodbc==5.2.0
-python-decouple==3.8
+azure-identity
+beautifulsoup4
+fast-to-sql
+numpy
+pandas
+pyodbc
+python-decouple
