@@ -14,6 +14,8 @@ class Agent:
                 "Name#$ishares_name",
                 "Sector#$ishares_sector",
                 "$ISIN",
+                "$CUSIP",
+                "$SEDOL",
                 "Exchange#$ishares_exchange_name",
                 "Location#$country_name",
                 "Index#$ishares_index",

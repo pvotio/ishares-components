@@ -22,7 +22,7 @@ class iShare:
 
     TIME_OUT = 10
     WAIT_TIME = 5
-    MAX_RETRY = 3
+    MAX_RETRY = 4
 
     HEADERS = {
         "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36"
@@ -35,8 +35,6 @@ class iShare:
         "Accrual Date",
         "Notional Value",
         "Shares",
-        "CUSIP",
-        "SEDOL",
     ]
 
     def __init__(self):
