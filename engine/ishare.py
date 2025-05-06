@@ -8,7 +8,6 @@ from datetime import datetime
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from dateutil.parser import parse
 
 from config import logger, settings
 
@@ -65,15 +64,9 @@ class iShare:
             logger.error(f"Failed to fetch JSON data from {index} {url}")
             return False, None
 
-        try:
-            date = self.extract_date(url, skip_rows)
-        except Exception as e:
-            logger.warning(f"Failed to extract date from csv {index} {url}")
-            return False, None
-
         self.add_marketvalue(dataframe)
         self.add_index(dataframe, index)
-        self.add_date(dataframe, date)
+        self.add_date(dataframe, datetime.utcnow())
 
         if skip_rows == 2:
             dataframe.rename(columns={"Issuer Ticker": "Ticker"}, inplace=True)
@@ -94,7 +87,6 @@ class iShare:
         rows = []
         columns = self.extract_columns(url)
         columns = {len(columns): columns}
-        url = url.split("?")[0] + "?tab=all&fileType=json"
         _, req = self.request(url)
         data = json.load(io.StringIO(req.content.decode("utf-8-sig")))["aaData"]
         for row in data:
@@ -109,25 +101,6 @@ class iShare:
             rows.append(newrow)
 
         return pd.DataFrame(rows)
-
-    def extract_date(self, url, skip_rows):
-        _, req = self.request(url)
-        return self.__extract_date(io.StringIO(req.content.decode("utf-8")), skip_rows)
-
-    def __extract_date(self, csv, skip_rows):
-        if skip_rows == 2:
-            df = pd.read_csv(csv, nrows=1)
-            date = list(df.keys())[1]
-            date = parse(date).date().__str__()
-            return datetime.strptime(date, "%Y-%m-%d")
-
-        elif skip_rows == 9:
-            df = pd.read_csv(csv, nrows=1)
-            date = df.to_numpy().tolist()[0][0]
-            date = parse(date).date().__str__()
-            return datetime.strptime(date, "%Y-%m-%d")
-
-        return False
 
     def extract_columns(self, url):
         url = url.split(".ajax")[0]
