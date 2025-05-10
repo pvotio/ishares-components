@@ -1,6 +1,6 @@
 # iShares Components
 
-**iShares Components** is a Python-based data pipeline that automates the collection, transformation, and storage of financial data related to iShares ETFs. It integrates with Microsoft SQL Server, utilizes proxy-enabled scraping (via Bright Data), and supports Docker-based deployment for seamless operation in production environments.
+This repository contains an end-to-end **Python ETL pipeline** deployed to **Azure Kubernetes Service (AKS)**. It scrapes key financial data on the constituents of various iShares ETFs, transforms the data, and loads it into an **Azure SQL Database**. The pipeline is orchestrated by workload IDs, uses **Bright Data** as a proxy service for reliable scraping, and is containerized with Docker.
 
  ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
 
@@ -24,9 +24,6 @@
 - [License](#license)
 - [Contact](#contact)
 
-## Overview
-
-This repository contains an end-to-end **Python ETL pipeline** deployed to **Azure Kubernetes Service (AKS)**. It scrapes key financial data on the constituents of various iShares ETFs, transforms the data, and loads it into an **Azure SQL Database**. The pipeline is orchestrated by workload IDs, uses **Bright Data** as a proxy service for reliable scraping, and is containerized with Docker.
 
 ## Core Workflow
 
