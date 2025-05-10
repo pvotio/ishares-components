@@ -2,7 +2,7 @@
 
 **iShares Components** is a Python-based data pipeline that automates the collection, transformation, and storage of financial data related to iShares ETFs. It integrates with Microsoft SQL Server, utilizes proxy-enabled scraping (via Bright Data), and supports Docker-based deployment for seamless operation in production environments.
 
-![Build Status](https://img.shields.io/azure-devops/build/your_org/your_project/1)  ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+ ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
 
 ## Table of Contents
 
