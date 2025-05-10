@@ -2,7 +2,9 @@
 
 This repository contains an end-to-end **Python ETL pipeline** deployed to **Azure Kubernetes Service (AKS)**. It scrapes key financial data on the constituents of various iShares ETFs, transforms the data, and loads it into an **Azure SQL Database**. The pipeline is orchestrated by workload IDs, uses **Bright Data** as a proxy service for reliable scraping, and is containerized with Docker.
 
- ![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)
+[![Build Status](https://img.shields.io/badge/Azure%20DevOps-CI%20%E2%9C%94-blue)](#)
+[![Python](https://img.shields.io/badge/Python-3.13-blue)](#)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue)](#license)
 
 ## Table of Contents
 
