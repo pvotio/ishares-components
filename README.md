@@ -1,6 +1,6 @@
-# iShares Components
+## iShares Components
 
-This repository contains an end-to-end **Python ETL pipeline** deployed to **Azure Kubernetes Service (AKS)**. It scrapes key financial data on the constituents of various iShares ETFs, transforms the data, and loads it into an **Azure SQL Database**. The pipeline is orchestrated by workload IDs, uses **Bright Data** as a proxy service for reliable scraping, and is containerized with Docker.
+This repository contains an end-to-end **Python ETL pipeline** deployed to **Azure Kubernetes Service (AKS)**. It scrapes key financial data on the constituents of various iShares ETFs, transforms the data, and loads it into an **Azure SQL Database**. It is containerized with Docker, uses **Azure Managed Identity** for passwordless authentication, and routes scraping requests through **Bright Data** proxy.
 
 [![Build Status](https://img.shields.io/badge/Azure%20DevOps-CI%20%E2%9C%94-blue)](#)
 [![Python](https://img.shields.io/badge/Python-3.13-blue)](#)
@@ -29,10 +29,10 @@ This repository contains an end-to-end **Python ETL pipeline** deployed to **Azu
 
 ## Core Workflow
 
-1. **Initialization**: `main.py` accepts a `WORKLOAD_ID`, sets up logging, and loads configuration.
+1. **Initialization**: `main.py` sets up logging and leverages Azure Workload Identity (Managed Identity) for passwordless authentication to Azure services—no stored credentials required.
 2. **Scraping**: `ishare.py` retrieves ETF constituent tickers and metadata from iShares, routing HTTP requests through the Bright Data proxy.
 3. **Transformation**: `transformer.py` and `utils.py` normalize, enrich, and validate the scraped data.
-4. **Loading**: `mssql.py` connects to Azure SQL Database and performs upserts of transformed records.
+4. **Loading**: `mssql.py` connects to Azure SQL Database using Azure AD authentication (via Managed Identity) and performs upserts of transformed records.
 5. **Containerization**: Dockerfile builds a Docker image based on **Python 3.13.2**, installs dependencies, and sets the ETL command.
 6. **Deployment**: Image is pushed to Azure Container Registry (ACR) and deployed on AKS.
 
@@ -41,7 +41,7 @@ This repository contains an end-to-end **Python ETL pipeline** deployed to **Azu
 1. **Scraping Module**: Fetches data via Bright Data proxy (`ishare.py`).
 2. **Transformation Module**: Cleans and formats data (`transformer.py`, `utils.py`).
 3. **Database Module**: Interfaces with Azure SQL DB (`mssql.py`).
-4. **Orchestration**: `core.py` coordinates module execution by workload ID.
+4. **Orchestration**: `core.py` coordinates module execution by Managed Identity.
 5. **Container & CI/CD**: Built with Docker and deployed via Azure Pipelines.
 
 ## Prerequisites
@@ -73,17 +73,17 @@ cd shares-components
 
 The pipeline relies on these environment variables, typically injected via Kubernetes secrets or ConfigMaps:
 
-| Variable             | Description                            |
-|----------------------|----------------------------------------|
-| `LOG_LEVEL`          | Logging verbosity (e.g., INFO, DEBUG)  |
-| `OUTPUT_TABLE`       | Target table in Azure SQL DB          |
-| `BRIGHTDATA_USER`    | Bright Data API username              |
-| `BRIGHTDATA_PASSWD`  | Bright Data API password              |
-| `BRIGHTDATA_PROXY`   | Proxy host (e.g., `brd.superproxy.io`) |
-| `BRIGHTDATA_PORT`    | Proxy port (e.g., `33335`)             |
-| `MSSQL_AD_LOGIN`     | Enable Azure AD authentication (true)  |
-| `MSSQL_SERVER`       | Azure SQL server hostname             |
-| `MSSQL_DATABASE`     | Azure SQL database name               |
+| Variable             | Description                             |
+|----------------------|-----------------------------------------|
+| `LOG_LEVEL`          | Logging verbosity (e.g., INFO, DEBUG)   |
+| `OUTPUT_TABLE`       | Target table in Azure SQL DB            |
+| `BRIGHTDATA_USER`    | Bright Data API username                |
+| `BRIGHTDATA_PASSWD`  | Bright Data API password                |
+| `BRIGHTDATA_PROXY`   | Proxy host (e.g., `brd.superproxy.io`)   |
+| `BRIGHTDATA_PORT`    | Proxy port (e.g., `33335`)              |
+| `MSSQL_AD_LOGIN`     | Enable Azure AD authentication (true)   |
+| `MSSQL_SERVER`       | Azure SQL server hostname               |
+| `MSSQL_DATABASE`     | Azure SQL database name                 |
 
 ## Dockerfile Details
 
@@ -91,7 +91,7 @@ The pipeline relies on these environment variables, typically injected via Kuber
 - **System Dependencies**: Includes ODBC driver (`msodbcsql18`), `mssql-tools`, and Unix ODBC headers.
 - **Python Dependencies**: Installs packages from `requirements.txt` without cache.
 - **User Context**: Creates a non-root `client` user for security.
-- **Command**: Executes `python main.py` with the provided `WORKLOAD_ID`.
+- **Command**: Executes `python main.py`.
 
 ## Scheduled Execution
 
@@ -152,7 +152,7 @@ steps:
 
 ```bash
 export AZURE_SQL_...  # set necessary env vars
-python main.py --workload-id YOUR_ID
+python main.py
 ```
 
 **AKS Deployment**: Update your Kubernetes manifest or Helm chart to reference the ACR image `shares-components:latest`.
